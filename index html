@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Love You ❤️</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:system-ui,-apple-system;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#000;
+overflow-x:hidden;
+}
+
+body.landing-bg{
+background:url("bg.jpg") center/cover no-repeat fixed;
+}
+
+.card{
+background:rgba(255,255,255,.92);
+backdrop-filter:blur(8px);
+width:92%;
+max-width:420px;
+padding:25px;
+border-radius:20px;
+box-shadow:0 20px 40px rgba(0,0,0,.35);
+text-align:center;
+position:relative;
+}
+
+h1{color:#e91e63;margin-top:0}
+
+input,select{
+width:90%;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid #ccc;
+font-size:16px;
+}
+
+button{
+background:#e91e63;
+color:#fff;
+border:none;
+padding:12px 20px;
+border-radius:25px;
+font-size:16px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:disabled{
+background:#aaa;
+cursor:not-allowed;
+}
+
+.clock{
+position:absolute;
+top:10px;
+right:15px;
+font-size:12px;
+color:#444;
+}
+
+.home{
+position:absolute;
+top:10px;
+left:15px;
+cursor:pointer;
+color:#e91e63;
+}
+
+footer{
+margin-top:18px;
+font-size:13px;
+color:#555;
+}
+
+.whatsapp{
+display:inline-block;
+margin-top:12px;
+background:#25D366;
+color:#fff;
+padding:10px 18px;
+border-radius:20px;
+text-decoration:none;
+font-size:15px;
+}
+
+.premium{
+margin-top:20px;
+padding:15px;
+border-radius:15px;
+border:2px dashed #e9b44c;
+background:#fff7e6;
+font-size:14px;
+}
+
+.photo img{
+width:100%;
+border-radius:15px;
+margin-top:10px;
+display:none;
+}
+
+.emoji{
+position:fixed;
+top:-20px;
+font-size:26px;
+animation:fall linear forwards;
+pointer-events:none;
+}
+
+@keyframes fall{
+to{transform:translateY(110vh);opacity:0}
+}
+</style>
+</head>
+
+<body class="landing-bg">
+
+<!-- LANDING PAGE -->
+<div class="card" id="landing">
+<h1>I Love You ❤️</h1>
+<p>Create a Valentine digital greeting card</p>
+
+<select id="lang">
+<option value="en">English</option>
+<option value="hi">Hindi</option>
+<option value="np">Nepali</option>
+</select>
+
+<input id="from" placeholder="Your Name">
+<input id="to" placeholder="Partner's Name">
+
+<button onclick="createCard()">Create Card 💌</button>
+
+<p style="font-size:13px;color:#777">
+💖 Cards created: <b id="countCreate">0</b>
+</p>
+
+<footer>
+<a class="whatsapp" href="https://wa.me/9779802985732" target="_blank">
+Contact Developer (Chandu)
+</a>
+</footer>
+</div>
+
+<!-- GREETING CARD PAGE -->
+<div class="card" id="card" style="display:none;">
+<div class="home" onclick="goHome()">🏠 Home</div>
+<div class="clock" id="clock"></div>
+
+<h1>Happy Valentine Week 💖</h1>
+<p id="message"></p>
+
+<div class="photo">
+📸 Upload Couple Photo
+<input type="file" accept="image/*" onchange="loadPhoto(event)">
+<img id="photo">
+</div>
+
+<a class="whatsapp" id="shareBtn" target="_blank">Share on WhatsApp</a>
+
+<!-- PREMIUM OPT-IN -->
+<div class="premium">
+<b>🌟 Premium Love Feature</b><br><br>
+
+<label style="display:flex;gap:8px;text-align:left">
+<input type="checkbox" id="consent">
+<span>
+I agree to share my card details with the developer
+for premium customization & support.
+</span>
+</label>
+
+<button id="leadBtn" disabled>Send Details to Developer 💬</button>
+
+<p style="margin-top:10px;font-size:13px">
+💰 Premium Price:<br>
+🇳🇵 NPR 149 — eSewa / Khalti<br>
+📲 Number: <b>9802985732</b>
+</p>
+</div>
+
+<footer id="footerText"></footer>
+<footer>Developer WhatsApp: +977 9802985732</footer>
+</div>
+
+<script>
+let created = localStorage.getItem("created") || 0;
+document.getElementById("countCreate").innerText = created;
+
+function createCard(){
+const f=from.value.trim();
+const t=to.value.trim();
+const l=lang.value;
+if(!f||!t){alert("Please fill all fields ❤️");return;}
+created++;
+localStorage.setItem("created",created);
+location.href=`?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&lang=${l}`;
+}
+
+function goHome(){location.href=location.pathname;}
+
+function updateClock(){
+const d=new Date();
+clockEl.innerHTML=d.toLocaleTimeString()+"<br>"+d.toDateString();
+}
+
+function loadPhoto(e){
+photo.src=URL.createObjectURL(e.target.files[0]);
+photo.style.display="block";
+}
+
+const p=new URLSearchParams(location.search);
+const f=p.get("from");
+const t=p.get("to");
+const l=p.get("lang");
+
+if(f&&t){
+document.body.classList.remove("landing-bg");
+landing.style.display="none";
+card.style.display="block";
+
+clockEl=document.getElementById("clock");
+setInterval(updateClock,1000);updateClock();
+
+const d=new Date().getDate()+"-2";
+const map={
+"7-2":"🌹 Happy Rose Day",
+"8-2":"💍 Happy Propose Day",
+"9-2":"🍫 Happy Chocolate Day",
+"10-2":"🧸 Happy Teddy Day",
+"11-2":"🤝 Happy Promise Day",
+"12-2":"🤗 Happy Hug Day",
+"13-2":"💋 Happy Kiss Day",
+"14-2":"❤️ Happy Valentine’s Day"
+};
+
+message.innerText=(map[d]||"💖 Special Day")+" "+t;
+footerText.innerText=`Forever yours — ${f}`;
+
+shareBtn.href=`https://wa.me/?text=${encodeURIComponent(
+"💖 Valentine Card for you:\n"+location.href
+)}`;
+
+startEmojis(d);
+
+consent.onchange=()=>leadBtn.disabled=!consent.checked;
+
+leadBtn.onclick=()=>{
+const msg=`💖 Valentine Card Premium Request
+
+Sender: ${f}
+Receiver: ${t}
+Language: ${l}
+Card Link: ${location.href}
+
+Payment: eSewa / Khalti
+Number: 9802985732
+
+Interested in premium customization.`;
+
+window.open(
+`https://wa.me/9779802985732?text=${encodeURIComponent(msg)}`,
+"_blank"
+);
+};
+}
+
+function startEmojis(d){
+const eMap={
+"7-2":"🌹","8-2":"💍","9-2":"🍫","10-2":"🧸",
+"11-2":"🤝","12-2":"🤗","13-2":"💋","14-2":"❤️"
+};
+const emo=eMap[d]||"❤️";
+setInterval(()=>{
+const e=document.createElement("div");
+e.className="emoji";
+e.innerText=emo;
+e.style.left=Math.random()*100+"vw";
+e.style.animationDuration=(3+Math.random()*3)+"s";
+document.body.appendChild(e);
+setTimeout(()=>e.remove(),6000);
+},450);
+}
+</script>
+
+</body>
+</html>
