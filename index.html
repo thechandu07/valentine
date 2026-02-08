@@ -11,12 +11,14 @@
 *{box-sizing:border-box;margin:0;font-family:Poppins}
 body{background:#000;color:#fff}
 
-/* ---------- LANDING ---------- */
-#page1{
+#page1,#page2{
   min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
+}
+
+#page1{
   background:linear-gradient(120deg,#ff0844,#ffb199);
   animation:bg 6s infinite alternate;
 }
@@ -26,52 +28,81 @@ body{background:#000;color:#fff}
   background:#fff;
   color:#000;
   width:92%;
-  max-width:380px;
+  max-width:420px;
   border-radius:20px;
   padding:18px;
   text-align:center;
 }
+
 h1{
   font-family:'Great Vibes',cursive;
-  font-size:36px;
+  font-size:clamp(28px,6vw,38px);
   color:#e6005c;
 }
+
 .preview{
-  height:170px;
+  height:180px;
   background:#ddd center/cover;
   border-radius:15px;
   margin:12px 0;
 }
+
 input,button{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-top:8px;
-  border-radius:10px;
+  border-radius:12px;
+  font-size:16px;
 }
+
 button{
   border:none;
   background:#e6005c;
   color:#fff;
-  font-size:16px;
+}
+
+footer{
+  margin-top:12px;
+  font-size:13px;
+  opacity:.8;
 }
 
 /* ---------- PAGE 2 ---------- */
-#page2{display:none;min-height:100vh;background-size:cover}
+#page2{
+  display:none;
+  background-size:cover;
+  background-position:center;
+}
 .overlay{
   background:rgba(0,0,0,.65);
   min-height:100vh;
+  width:100%;
   padding:20px;
 }
-.top{display:flex;justify-content:space-between}
-.home{background:#fff;color:#000;border:none;padding:6px 14px;border-radius:20px}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.home{
+  background:#fff;
+  color:#000;
+  padding:6px 16px;
+  border-radius:20px;
+  border:none;
+}
 
 .gift{
-  margin-top:70px;
+  margin:clamp(40px,12vh,90px) auto 0;
   background:rgba(255,255,255,.92);
   color:#000;
   padding:25px;
   border-radius:20px;
   text-align:center;
+  max-width:420px;
   animation:pulse 2.5s infinite;
 }
 @keyframes pulse{50%{transform:scale(1.03)}}
@@ -79,13 +110,17 @@ button{
 .label{font-size:18px;color:#e6005c}
 .quote{
   font-family:'Great Vibes',cursive;
-  font-size:28px;
+  font-size:clamp(24px,6vw,32px);
   color:#e6005c;
   margin-top:10px;
 }
-.nepali{font-size:18px;margin-top:8px}
+.nepali{font-size:clamp(14px,4.5vw,18px)}
 
-footer{text-align:center;margin-top:25px;font-size:13px;opacity:.8}
+.actions{
+  text-align:center;
+  margin-top:25px;
+}
+.actions button{margin-top:10px}
 </style>
 </head>
 
@@ -106,7 +141,9 @@ footer{text-align:center;margin-top:25px;font-size:13px;opacity:.8}
 
     <footer>
       Developer: Chandu<br>
-      <a href="https://wa.me/9779802985732" target="_blank">WhatsApp +9779802985732</a>
+      <a href="https://wa.me/9779802985732" target="_blank">
+        WhatsApp +977 9802985732
+      </a>
     </footer>
   </div>
 </div>
@@ -117,6 +154,7 @@ footer{text-align:center;margin-top:25px;font-size:13px;opacity:.8}
     <div class="top">
       <button class="home" onclick="location.reload()">Home</button>
       <div id="time"></div>
+      <div id="nepDate"></div>
     </div>
 
     <div class="gift" id="card">
@@ -125,12 +163,13 @@ footer{text-align:center;margin-top:25px;font-size:13px;opacity:.8}
       <div id="nepali" class="nepali"></div>
     </div>
 
-    <div style="margin-top:25px;text-align:center">
-      <button onclick="download()">Download Card PNG 📥</button>
-      <button onclick="share()" style="margin-top:10px">Share 💌</button>
+    <div class="actions">
+      <button onclick="download('portrait')">Download Portrait PNG 📥</button>
+      <button onclick="download('landscape')">Download Landscape PNG 📥</button>
+      <button onclick="share()">Share 💌</button>
     </div>
 
-    <footer>
+    <footer style="text-align:center;margin-top:30px">
       Developer WhatsApp: +977 9802985732
     </footer>
   </div>
@@ -150,68 +189,111 @@ function create(){
   sessionStorage.setItem("img",img64);
   sessionStorage.setItem("you",you.value);
   sessionStorage.setItem("partner",partner.value);
-  open();
+  openCard();
 }
 
-function open(){
+function openCard(){
   page1.style.display="none";
   page2.style.display="block";
   page2.style.backgroundImage=`url(${sessionStorage.getItem("img")})`;
   setQuote();
-  setInterval(()=>time.innerText=new Date().toLocaleString(),1000);
+  setInterval(updateTime,1000);
+  updateTime();
 }
 
+function updateTime(){
+  const d=new Date();
+  time.innerText=d.toLocaleString();
+  nepDate.innerText="वि.सं.: "+toBS(d);
+}
+
+/* Valentine quotes */
 function setQuote(){
   const d=new Date().getDate();
   const y=sessionStorage.getItem("you");
   const p=sessionStorage.getItem("partner");
 
   const days={
-    7:["🌹 Rose Day","This rose carries my love for you","यो गुलाबले मेरो माया बोकेको छ"],
-    8:["💍 Propose Day",`${y}, I choose you forever`,`म तिमीलाई सधैंका लागि रोज्छु`],
-    9:["🍫 Chocolate Day","Life is sweeter with you","तिमी संग जीवन झन् मिठो हुन्छ"],
-    10:["🧸 Teddy Day","You are my comfort","तिमी मेरो सबैभन्दा न्यानो साथ हौ"],
-    11:["🤝 Promise Day","I promise to love you always","सधैं माया गर्ने वाचा गर्दछु"],
+    7:["🌹 Rose Day","This rose is for you","यो गुलाब तिम्रो लागि"],
+    8:["💍 Propose Day",`${y}, I choose you`,`म तिमीलाई रोज्छु`],
+    9:["🍫 Chocolate Day","Life is sweeter with you","जीवन तिमी संग मिठो छ"],
+    10:["🧸 Teddy Day","You are my comfort","तिमी मेरो न्यानो साथ"],
+    11:["🤝 Promise Day","Forever together","सधैं संगै रहने वाचा"],
     12:["💋 Kiss Day","A kiss full of love","मायाले भरिएको चुम्बन"],
     13:["🤗 Hug Day","This hug says everything","यो अँगालोले सबै भन्छ"],
     14:["❤️ Valentine’s Day",`Happy Valentine’s Day ${p}`,"ह्याप्पी भ्यालेन्टाइन डे ❤️"]
   };
-
-  const v=days[d]||["💖 Love Day",`${y} & ${p} forever`,`सधैं संगै ❤️`];
+  const v=days[d]||["💖 Love Day",`${y} & ${p} Forever`,`सधैं संगै ❤️`];
   label.innerText=v[0];
   quote.innerText=v[1];
   nepali.innerText=v[2];
 }
 
-function download(){
+/* Auto-fit text */
+function fitText(ctx,text,maxWidth,startSize,font){
+  let size=startSize;
+  do{
+    ctx.font=`${size}px ${font}`;
+    if(ctx.measureText(text).width<=maxWidth) break;
+    size--;
+  }while(size>14);
+  return size;
+}
+
+/* PNG Download */
+function download(type){
+  const ratio=window.devicePixelRatio||1;
+  const W=type==="landscape"?1400:900;
+  const H=type==="landscape"?900:1400;
+
   const c=document.createElement("canvas");
-  c.width=800;c.height=1200;
+  c.width=W*ratio;c.height=H*ratio;
   const ctx=c.getContext("2d");
+  ctx.scale(ratio,ratio);
 
   const img=new Image();
   img.onload=()=>{
-    ctx.drawImage(img,0,0,800,1200);
-    ctx.fillStyle="rgba(0,0,0,.5)";
-    ctx.fillRect(0,0,800,1200);
+    ctx.drawImage(img,0,0,W,H);
+    ctx.fillStyle="rgba(0,0,0,.55)";
+    ctx.fillRect(0,0,W,H);
+
     ctx.fillStyle="#fff";
-    ctx.font="40px Great Vibes";
-    ctx.fillText(label.innerText,200,350);
-    ctx.fillText(quote.innerText,150,450);
-    ctx.font="26px Poppins";
-    ctx.fillText(nepali.innerText,200,520);
+    ctx.textAlign="center";
+
+    let fs=fitText(ctx,label.innerText,W-100,46,"Great Vibes");
+    ctx.font=`${fs}px Great Vibes`;
+    ctx.fillText(label.innerText,W/2,H*0.3);
+
+    fs=fitText(ctx,quote.innerText,W-120,38,"Great Vibes");
+    ctx.font=`${fs}px Great Vibes`;
+    ctx.fillText(quote.innerText,W/2,H*0.4);
+
+    fs=fitText(ctx,nepali.innerText,W-140,24,"Poppins");
+    ctx.font=`${fs}px Poppins`;
+    ctx.fillText(nepali.innerText,W/2,H*0.47);
 
     const a=document.createElement("a");
     a.href=c.toDataURL("image/png");
-    a.download="valentine-card.png";
+    a.download=`valentine-${type}.png`;
     a.click();
-  }
+  };
   img.src=sessionStorage.getItem("img");
 }
 
+/* Share */
 function share(){
-  window.open(`https://wa.me/?text=${encodeURIComponent("I made a Valentine card for you 💖")}`);
+  window.open(`https://wa.me/?text=${encodeURIComponent("I made a Valentine gift card for you 💖")}`);
+}
+
+/* Nepali date (simple BS conversion) */
+function toBS(d){
+  const bsYear=d.getFullYear()+57;
+  const bsMonth=d.getMonth()+8;
+  const bsDay=d.getDate();
+  return `${bsYear}-${bsMonth}-${bsDay}`;
 }
 </script>
 
 </body>
 </html>
+
