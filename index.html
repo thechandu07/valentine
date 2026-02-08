@@ -2,91 +2,90 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Love Card</title>
+<title>Valentine Gift Card</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-*{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-body{margin:0;background:#111;color:#fff}
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins&display=swap" rel="stylesheet">
 
-/* ---------- PAGE 1 ---------- */
+<style>
+*{box-sizing:border-box;margin:0;font-family:Poppins}
+body{background:#000;color:#fff}
+
+/* ---------- LANDING ---------- */
 #page1{
   min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:url("https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e") center/cover;
+  background:linear-gradient(120deg,#ff0844,#ffb199);
+  animation:bg 6s infinite alternate;
 }
+@keyframes bg{to{background-position:100%}}
+
 .card{
   background:#fff;
   color:#000;
-  width:90%;
-  max-width:360px;
+  width:92%;
+  max-width:380px;
   border-radius:20px;
-  padding:15px;
+  padding:18px;
   text-align:center;
 }
+h1{
+  font-family:'Great Vibes',cursive;
+  font-size:36px;
+  color:#e6005c;
+}
 .preview{
-  height:180px;
+  height:170px;
+  background:#ddd center/cover;
   border-radius:15px;
-  background:url("https://images.unsplash.com/photo-1517841905240-472988babdf9") center/cover;
-  margin-bottom:10px;
+  margin:12px 0;
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:10px;
+}
+button{
+  border:none;
+  background:#e6005c;
+  color:#fff;
+  font-size:16px;
 }
 
 /* ---------- PAGE 2 ---------- */
-#page2{
-  display:none;
-  min-height:100vh;
-  background-size:cover;
-  background-position:center;
-}
+#page2{display:none;min-height:100vh;background-size:cover}
 .overlay{
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.65);
   min-height:100vh;
   padding:20px;
 }
-.home{
-  background:#fff;
+.top{display:flex;justify-content:space-between}
+.home{background:#fff;color:#000;border:none;padding:6px 14px;border-radius:20px}
+
+.gift{
+  margin-top:70px;
+  background:rgba(255,255,255,.92);
   color:#000;
-  padding:8px 14px;
+  padding:25px;
   border-radius:20px;
-  border:none;
-}
-.quote{
-  margin-top:90px;
   text-align:center;
-  font-size:22px;
-  line-height:1.6;
-  font-family:'Georgia',serif;
+  animation:pulse 2.5s infinite;
 }
+@keyframes pulse{50%{transform:scale(1.03)}}
 
-/* ---------- BUTTON ---------- */
-button{
-  padding:12px 20px;
-  border:none;
-  border-radius:30px;
-  background:#25d366;
-  color:#fff;
-  font-size:16px;
-  cursor:pointer;
+.label{font-size:18px;color:#e6005c}
+.quote{
+  font-family:'Great Vibes',cursive;
+  font-size:28px;
+  color:#e6005c;
+  margin-top:10px;
 }
+.nepali{font-size:18px;margin-top:8px}
 
-footer{
-  font-size:13px;
-  opacity:.7;
-  margin-top:15px;
-}
-
-/* ---------- ROSE PETALS ---------- */
-.petal{
-  position:fixed;
-  top:-10px;
-  font-size:18px;
-  animation:fall linear infinite;
-}
-@keyframes fall{
-  to{transform:translateY(110vh) rotate(360deg)}
-}
+footer{text-align:center;margin-top:25px;font-size:13px;opacity:.8}
 </style>
 </head>
 
@@ -95,15 +94,19 @@ footer{
 <!-- PAGE 1 -->
 <div id="page1">
   <div class="card">
+    <h1>Happy Valentine Week</h1>
+
     <div id="preview" class="preview"></div>
 
-    <input type="file" accept="image/*" id="img"><br><br>
+    <input id="you" placeholder="Your Name">
+    <input id="partner" placeholder="Partner Name">
+    <input type="file" id="img" accept="image/*">
 
-    <button onclick="createCard()">Create Card</button>
+    <button onclick="create()">Create Card 💝</button>
 
     <footer>
       Developer: Chandu<br>
-      <a href="https://wa.me/9779802985732" target="_blank">WhatsApp</a>
+      <a href="https://wa.me/9779802985732" target="_blank">WhatsApp +9779802985732</a>
     </footer>
   </div>
 </div>
@@ -111,12 +114,20 @@ footer{
 <!-- PAGE 2 -->
 <div id="page2">
   <div class="overlay">
-    <button class="home" onclick="goHome()">Home</button>
+    <div class="top">
+      <button class="home" onclick="location.reload()">Home</button>
+      <div id="time"></div>
+    </div>
 
-    <div id="quote" class="quote"></div>
+    <div class="gift" id="card">
+      <div id="label" class="label"></div>
+      <div id="quote" class="quote"></div>
+      <div id="nepali" class="nepali"></div>
+    </div>
 
-    <div style="text-align:center;margin-top:30px">
-      <button onclick="share()">Share on WhatsApp</button>
+    <div style="margin-top:25px;text-align:center">
+      <button onclick="download()">Download Card PNG 📥</button>
+      <button onclick="share()" style="margin-top:10px">Share 💌</button>
     </div>
 
     <footer>
@@ -128,71 +139,78 @@ footer{
 <script>
 let img64="";
 
-/* Image upload preview */
-document.getElementById("img").addEventListener("change",e=>{
-  const f=e.target.files[0];
-  if(!f)return;
+img.onchange=e=>{
   const r=new FileReader();
-  r.onload=()=>{
-    img64=r.result;
-    document.getElementById("preview").style.backgroundImage=`url(${img64})`;
-  }
-  r.readAsDataURL(f);
-});
-
-/* Create card */
-function createCard(){
-  if(!img64){alert("Please upload image");return;}
-  location.hash=encodeURIComponent(img64);
-  openPage2();
+  r.onload=()=>{img64=r.result;preview.style.backgroundImage=`url(${img64})`}
+  r.readAsDataURL(e.target.files[0]);
 }
 
-/* Open second page */
-function openPage2(){
-  document.getElementById("page1").style.display="none";
-  document.getElementById("page2").style.display="block";
-  const img=decodeURIComponent(location.hash.substring(1));
-  document.getElementById("page2").style.backgroundImage=`url(${img})`;
-  document.getElementById("quote").innerText=getQuote();
-  petals();
+function create(){
+  if(!img64||!you.value||!partner.value){alert("Fill all fields");return;}
+  sessionStorage.setItem("img",img64);
+  sessionStorage.setItem("you",you.value);
+  sessionStorage.setItem("partner",partner.value);
+  open();
 }
 
-/* Quotes by date */
-function getQuote(){
+function open(){
+  page1.style.display="none";
+  page2.style.display="block";
+  page2.style.backgroundImage=`url(${sessionStorage.getItem("img")})`;
+  setQuote();
+  setInterval(()=>time.innerText=new Date().toLocaleString(),1000);
+}
+
+function setQuote(){
   const d=new Date().getDate();
-  if(d==7) return "🌹 My love, this rose carries every feeling my heart holds for you.";
-  if(d==14) return "💖 You are my forever Valentine, today and always.";
-  return "💌 Every heartbeat of mine whispers your name.";
+  const y=sessionStorage.getItem("you");
+  const p=sessionStorage.getItem("partner");
+
+  const days={
+    7:["🌹 Rose Day","This rose carries my love for you","यो गुलाबले मेरो माया बोकेको छ"],
+    8:["💍 Propose Day",`${y}, I choose you forever`,`म तिमीलाई सधैंका लागि रोज्छु`],
+    9:["🍫 Chocolate Day","Life is sweeter with you","तिमी संग जीवन झन् मिठो हुन्छ"],
+    10:["🧸 Teddy Day","You are my comfort","तिमी मेरो सबैभन्दा न्यानो साथ हौ"],
+    11:["🤝 Promise Day","I promise to love you always","सधैं माया गर्ने वाचा गर्दछु"],
+    12:["💋 Kiss Day","A kiss full of love","मायाले भरिएको चुम्बन"],
+    13:["🤗 Hug Day","This hug says everything","यो अँगालोले सबै भन्छ"],
+    14:["❤️ Valentine’s Day",`Happy Valentine’s Day ${p}`,"ह्याप्पी भ्यालेन्टाइन डे ❤️"]
+  };
+
+  const v=days[d]||["💖 Love Day",`${y} & ${p} forever`,`सधैं संगै ❤️`];
+  label.innerText=v[0];
+  quote.innerText=v[1];
+  nepali.innerText=v[2];
 }
 
-/* Rose petals */
-function petals(){
-  for(let i=0;i<18;i++){
-    const p=document.createElement("div");
-    p.className="petal";
-    p.innerText="🌹";
-    p.style.left=Math.random()*100+"vw";
-    p.style.animationDuration=4+Math.random()*6+"s";
-    document.body.appendChild(p);
-    setTimeout(()=>p.remove(),9000);
+function download(){
+  const c=document.createElement("canvas");
+  c.width=800;c.height=1200;
+  const ctx=c.getContext("2d");
+
+  const img=new Image();
+  img.onload=()=>{
+    ctx.drawImage(img,0,0,800,1200);
+    ctx.fillStyle="rgba(0,0,0,.5)";
+    ctx.fillRect(0,0,800,1200);
+    ctx.fillStyle="#fff";
+    ctx.font="40px Great Vibes";
+    ctx.fillText(label.innerText,200,350);
+    ctx.fillText(quote.innerText,150,450);
+    ctx.font="26px Poppins";
+    ctx.fillText(nepali.innerText,200,520);
+
+    const a=document.createElement("a");
+    a.href=c.toDataURL("image/png");
+    a.download="valentine-card.png";
+    a.click();
   }
+  img.src=sessionStorage.getItem("img");
 }
 
-/* WhatsApp share */
 function share(){
-  const t=encodeURIComponent("I made a special love card for you 💖");
-  const u=encodeURIComponent(location.href);
-  window.open(`https://wa.me/?text=${t}%0A${u}`);
+  window.open(`https://wa.me/?text=${encodeURIComponent("I made a Valentine card for you 💖")}`);
 }
-
-/* Home */
-function goHome(){
-  location.hash="";
-  location.reload();
-}
-
-/* Auto open via link */
-if(location.hash.length>10) openPage2();
 </script>
 
 </body>
