@@ -2,44 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
 <title>I Love You ❤️</title>
 
 <style>
 *{box-sizing:border-box}
 body{
 margin:0;
-font-family:system-ui,-apple-system;
+font-family:system-ui,-apple-system,BlinkMacSystemFont;
 min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
 background:#000;
 overflow-x:hidden;
+overflow-y:auto;
+-webkit-text-size-adjust:100%;
 }
 
 body.landing{
-background:url("https://images.unsplash.com/photo-1518895949257-7621c3c786d7") center/cover no-repeat fixed;
+background:url("https://images.unsplash.com/photo-1518895949257-7621c3c786d7")
+no-repeat center center;
+background-size:cover;
 }
 
 .card{
-background:rgba(255,255,255,.94);
+background:rgba(255,255,255,.95);
 width:92%;
-max-width:430px;
-padding:24px;
+max-width:420px;
+padding:22px;
 border-radius:22px;
 box-shadow:0 18px 40px rgba(0,0,0,.4);
 text-align:center;
 position:relative;
+transform:translateZ(0);
 }
 
 h1{color:#e91e63;margin-top:0}
 
 input,select{
-width:90%;
-padding:12px;
-margin:10px 0;
-border-radius:10px;
+width:100%;
+padding:14px;
+margin:12px 0;
+border-radius:12px;
 border:1px solid #ccc;
 font-size:16px;
 }
@@ -48,8 +55,8 @@ button{
 background:#e91e63;
 color:#fff;
 border:none;
-padding:12px 22px;
-border-radius:25px;
+padding:14px 24px;
+border-radius:28px;
 font-size:16px;
 cursor:pointer;
 }
@@ -59,8 +66,8 @@ display:inline-block;
 margin-top:14px;
 background:#25D366;
 color:#fff;
-padding:10px 18px;
-border-radius:20px;
+padding:12px 20px;
+border-radius:24px;
 text-decoration:none;
 font-size:15px;
 }
@@ -79,6 +86,7 @@ top:10px;
 left:15px;
 cursor:pointer;
 color:#e91e63;
+font-size:15px;
 }
 
 .gift{
@@ -128,6 +136,10 @@ pointer-events:none;
 
 @keyframes fall{
 to{transform:translateY(110vh) rotate(360deg);opacity:0}
+}
+
+@media (orientation: landscape){
+.card{max-width:360px;}
 }
 </style>
 </head>
@@ -183,63 +195,77 @@ Developer: +977 9802985732
 
 <script>
 function createCard(){
-if(!from.value||!to.value){alert("Please fill names ❤️");return;}
-location.href=?from=${encodeURIComponent(from.value)}&to=${encodeURIComponent(to.value)};
+if(!from.value || !to.value){
+alert("Please fill both names ❤️");
+return;
+}
+const base = window.location.origin + window.location.pathname;
+window.location.href =
+base + "?from=" + encodeURIComponent(from.value) +
+"&to=" + encodeURIComponent(to.value);
 }
 
-function goHome(){location.href=location.pathname;}
+function goHome(){
+window.location.href = window.location.origin + window.location.pathname;
+}
 
 function updateClock(){
 const d=new Date();
 clock.innerHTML=d.toLocaleTimeString()+"<br>"+d.toDateString();
 }
 
-function preview(i){
+function preview(input){
 const r=new FileReader();
 r.onload=e=>preview.src=e.target.result;
-r.readAsDataURL(i.files[0]);
+r.readAsDataURL(input.files[0]);
 }
 
-const p=new URLSearchParams(location.search);
-const f=p.get("from");
-const t=p.get("to");
+document.addEventListener("keydown",e=>{
+if(e.key==="Enter") createCard();
+});
 
-if(f&&t){
+const params=new URLSearchParams(location.search);
+const f=params.get("from");
+const t=params.get("to");
+
+if(f && t){
 document.body.classList.remove("landing");
 landing.style.display="none";
 card.style.display="block";
 footerName.innerText=f;
-setInterval(updateClock,1000);updateClock();
 
-const d=new Date().getDate()+"-2";
+setInterval(updateClock,1000);
+updateClock();
+
+const day=new Date().getDate()+"-2";
 
 const data={
 "7-2":["🌹 Rose Day","https://images.unsplash.com/photo-1519681393784-d120267933ba",
-My love ${t}, this rose carries every feeling my heart holds for you.],
+`My love ${t}, this rose carries every feeling my heart holds for you.`],
 "8-2":["💍 Propose Day","https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
-${t}, today I choose you — today, tomorrow, always.],
+`${t}, today I choose you — today, tomorrow, always.`],
 "9-2":["🍫 Chocolate Day","https://images.unsplash.com/photo-1511381939415-c1d45c87d1a8",
-Sweet ${t}, just like chocolate, you melt my heart every day.],
+`Sweet ${t}, just like chocolate, you melt my heart every day.`],
 "10-2":["🧸 Teddy Day","https://images.unsplash.com/photo-1615484477201-9f4953340fab",
-${t}, whenever life feels heavy, I’ll be your comfort.],
+`${t}, whenever life feels heavy, I’ll be your comfort.`],
 "11-2":["🤝 Promise Day","https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-I promise you ${t}, my love, respect, and loyalty forever.],
+`I promise you ${t}, my love, respect, and loyalty forever.`],
 "12-2":["🤗 Hug Day","https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
-${t}, feel this hug reaching your heart right now.],
+`${t}, feel this hug reaching your heart right now.`],
 "13-2":["💋 Kiss Day","https://images.unsplash.com/photo-1517841905240-472988babdf9",
-${t}, this kiss holds everything words can’t say.],
+`${t}, this kiss holds everything words can’t say.`],
 "14-2":["❤️ Valentine’s Day","https://images.unsplash.com/photo-1518895949257-7621c3c786d7",
-${t}, you are my forever. Happy Valentine’s Day.]
+`${t}, you are my forever. Happy Valentine’s Day.`]
 };
 
-const x=data[d]||data["14-2"];
+const x=data[day]||data["14-2"];
 giftTitle.innerText=x[0];
 giftImg.src=x[1];
 letter.innerText=x[2];
 
-share.href=`https://wa.me/?text=${encodeURIComponent(
+share.href="https://wa.me/?text="+encodeURIComponent(
 "💖 A Valentine Card made for you:\n"+location.href
-)}`;
+);
 
 petals();
 }
