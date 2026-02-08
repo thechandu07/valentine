@@ -18,18 +18,17 @@ background:#000;
 overflow-x:hidden;
 }
 
-body.landing-bg{
-background:url("bg.jpg") center/cover no-repeat fixed;
+body.landing{
+background:url("https://images.unsplash.com/photo-1518895949257-7621c3c786d7") center/cover no-repeat fixed;
 }
 
 .card{
-background:rgba(255,255,255,.92);
-backdrop-filter:blur(8px);
+background:rgba(255,255,255,.94);
 width:92%;
-max-width:420px;
-padding:25px;
-border-radius:20px;
-box-shadow:0 20px 40px rgba(0,0,0,.35);
+max-width:430px;
+padding:24px;
+border-radius:22px;
+box-shadow:0 18px 40px rgba(0,0,0,.4);
 text-align:center;
 position:relative;
 }
@@ -49,16 +48,21 @@ button{
 background:#e91e63;
 color:#fff;
 border:none;
-padding:12px 20px;
+padding:12px 22px;
 border-radius:25px;
 font-size:16px;
 cursor:pointer;
-margin-top:10px;
 }
 
-button:disabled{
-background:#aaa;
-cursor:not-allowed;
+.whatsapp{
+display:inline-block;
+margin-top:14px;
+background:#25D366;
+color:#fff;
+padding:10px 18px;
+border-radius:20px;
+text-decoration:none;
+font-size:15px;
 }
 
 .clock{
@@ -77,64 +81,66 @@ cursor:pointer;
 color:#e91e63;
 }
 
+.gift{
+margin-top:16px;
+padding:16px;
+border-radius:18px;
+background:linear-gradient(135deg,#ff758c,#ff7eb3);
+color:#fff;
+}
+
+.gift img{
+width:100%;
+border-radius:14px;
+margin-bottom:10px;
+}
+
+.upload img{
+width:100%;
+border-radius:14px;
+margin-top:10px;
+}
+
+.letter{
+margin-top:15px;
+font-size:15px;
+line-height:1.6;
+color:#444;
+background:#fff;
+padding:15px;
+border-radius:15px;
+}
+
 footer{
-margin-top:18px;
+margin-top:15px;
 font-size:13px;
 color:#555;
 }
 
-.whatsapp{
-display:inline-block;
-margin-top:12px;
-background:#25D366;
-color:#fff;
-padding:10px 18px;
-border-radius:20px;
-text-decoration:none;
-font-size:15px;
-}
-
-.premium{
-margin-top:20px;
-padding:15px;
-border-radius:15px;
-border:2px dashed #e9b44c;
-background:#fff7e6;
-font-size:14px;
-}
-
-.photo img{
-width:100%;
-border-radius:15px;
-margin-top:10px;
-display:none;
-}
-
-.emoji{
+.petal{
 position:fixed;
-top:-20px;
-font-size:26px;
+top:-30px;
+width:22px;
+opacity:.85;
 animation:fall linear forwards;
 pointer-events:none;
 }
 
 @keyframes fall{
-to{transform:translateY(110vh);opacity:0}
+to{transform:translateY(110vh) rotate(360deg);opacity:0}
 }
 </style>
 </head>
 
-<body class="landing-bg">
+<body class="landing">
 
 <!-- LANDING PAGE -->
 <div class="card" id="landing">
 <h1>I Love You ❤️</h1>
-<p>Create a Valentine digital greeting card</p>
+<p>Create a digital Valentine greeting card</p>
 
-<select id="lang">
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="np">Nepali</option>
+<select>
+<option>English</option>
 </select>
 
 <input id="from" placeholder="Your Name">
@@ -142,155 +148,112 @@ to{transform:translateY(110vh);opacity:0}
 
 <button onclick="createCard()">Create Card 💌</button>
 
-<p style="font-size:13px;color:#777">
-💖 Cards created: <b id="countCreate">0</b>
-</p>
-
-<footer>
 <a class="whatsapp" href="https://wa.me/9779802985732" target="_blank">
 Contact Developer (Chandu)
 </a>
-</footer>
 </div>
 
-<!-- GREETING CARD PAGE -->
+<!-- CARD PAGE -->
 <div class="card" id="card" style="display:none;">
 <div class="home" onclick="goHome()">🏠 Home</div>
 <div class="clock" id="clock"></div>
 
 <h1>Happy Valentine Week 💖</h1>
-<p id="message"></p>
 
-<div class="photo">
+<div class="gift">
+<img id="giftImg">
+<h3 id="giftTitle"></h3>
+</div>
+
+<div class="upload">
 📸 Upload Couple Photo
-<input type="file" accept="image/*" onchange="loadPhoto(event)">
-<img id="photo">
+<input type="file" accept="image/*" onchange="preview(this)">
+<img id="preview">
 </div>
 
-<a class="whatsapp" id="shareBtn" target="_blank">Share on WhatsApp</a>
+<div class="letter" id="letter"></div>
 
-<!-- PREMIUM OPT-IN -->
-<div class="premium">
-<b>🌟 Premium Love Feature</b><br><br>
+<a class="whatsapp" id="share" target="_blank">Share on WhatsApp</a>
 
-<label style="display:flex;gap:8px;text-align:left">
-<input type="checkbox" id="consent">
-<span>
-I agree to share my card details with the developer
-for premium customization & support.
-</span>
-</label>
-
-<button id="leadBtn" disabled>Send Details to Developer 💬</button>
-
-<p style="margin-top:10px;font-size:13px">
-💰 Premium Price:<br>
-🇳🇵 NPR 149 — eSewa / Khalti<br>
-📲 Number: <b>9802985732</b>
-</p>
-</div>
-
-<footer id="footerText"></footer>
-<footer>Developer WhatsApp: +977 9802985732</footer>
+<footer>
+Forever yours — <span id="footerName"></span><br>
+Developer: +977 9802985732
+</footer>
 </div>
 
 <script>
-let created = localStorage.getItem("created") || 0;
-document.getElementById("countCreate").innerText = created;
-
 function createCard(){
-const f=from.value.trim();
-const t=to.value.trim();
-const l=lang.value;
-if(!f||!t){alert("Please fill all fields ❤️");return;}
-created++;
-localStorage.setItem("created",created);
-location.href=`?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&lang=${l}`;
+if(!from.value||!to.value){alert("Please fill names ❤️");return;}
+location.href=?from=${encodeURIComponent(from.value)}&to=${encodeURIComponent(to.value)};
 }
 
 function goHome(){location.href=location.pathname;}
 
 function updateClock(){
 const d=new Date();
-clockEl.innerHTML=d.toLocaleTimeString()+"<br>"+d.toDateString();
+clock.innerHTML=d.toLocaleTimeString()+"<br>"+d.toDateString();
 }
 
-function loadPhoto(e){
-photo.src=URL.createObjectURL(e.target.files[0]);
-photo.style.display="block";
+function preview(i){
+const r=new FileReader();
+r.onload=e=>preview.src=e.target.result;
+r.readAsDataURL(i.files[0]);
 }
 
 const p=new URLSearchParams(location.search);
 const f=p.get("from");
 const t=p.get("to");
-const l=p.get("lang");
 
 if(f&&t){
-document.body.classList.remove("landing-bg");
+document.body.classList.remove("landing");
 landing.style.display="none";
 card.style.display="block";
-
-clockEl=document.getElementById("clock");
+footerName.innerText=f;
 setInterval(updateClock,1000);updateClock();
 
 const d=new Date().getDate()+"-2";
-const map={
-"7-2":"🌹 Happy Rose Day",
-"8-2":"💍 Happy Propose Day",
-"9-2":"🍫 Happy Chocolate Day",
-"10-2":"🧸 Happy Teddy Day",
-"11-2":"🤝 Happy Promise Day",
-"12-2":"🤗 Happy Hug Day",
-"13-2":"💋 Happy Kiss Day",
-"14-2":"❤️ Happy Valentine’s Day"
+
+const data={
+"7-2":["🌹 Rose Day","https://images.unsplash.com/photo-1519681393784-d120267933ba",
+My love ${t}, this rose carries every feeling my heart holds for you.],
+"8-2":["💍 Propose Day","https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+${t}, today I choose you — today, tomorrow, always.],
+"9-2":["🍫 Chocolate Day","https://images.unsplash.com/photo-1511381939415-c1d45c87d1a8",
+Sweet ${t}, just like chocolate, you melt my heart every day.],
+"10-2":["🧸 Teddy Day","https://images.unsplash.com/photo-1615484477201-9f4953340fab",
+${t}, whenever life feels heavy, I’ll be your comfort.],
+"11-2":["🤝 Promise Day","https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+I promise you ${t}, my love, respect, and loyalty forever.],
+"12-2":["🤗 Hug Day","https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+${t}, feel this hug reaching your heart right now.],
+"13-2":["💋 Kiss Day","https://images.unsplash.com/photo-1517841905240-472988babdf9",
+${t}, this kiss holds everything words can’t say.],
+"14-2":["❤️ Valentine’s Day","https://images.unsplash.com/photo-1518895949257-7621c3c786d7",
+${t}, you are my forever. Happy Valentine’s Day.]
 };
 
-message.innerText=(map[d]||"💖 Special Day")+" "+t;
-footerText.innerText=`Forever yours — ${f}`;
+const x=data[d]||data["14-2"];
+giftTitle.innerText=x[0];
+giftImg.src=x[1];
+letter.innerText=x[2];
 
-shareBtn.href=`https://wa.me/?text=${encodeURIComponent(
-"💖 Valentine Card for you:\n"+location.href
+share.href=`https://wa.me/?text=${encodeURIComponent(
+"💖 A Valentine Card made for you:\n"+location.href
 )}`;
 
-startEmojis(d);
-
-consent.onchange=()=>leadBtn.disabled=!consent.checked;
-
-leadBtn.onclick=()=>{
-const msg=`💖 Valentine Card Premium Request
-
-Sender: ${f}
-Receiver: ${t}
-Language: ${l}
-Card Link: ${location.href}
-
-Payment: eSewa / Khalti
-Number: 9802985732
-
-Interested in premium customization.`;
-
-window.open(
-`https://wa.me/9779802985732?text=${encodeURIComponent(msg)}`,
-"_blank"
-);
-};
+petals();
 }
 
-function startEmojis(d){
-const eMap={
-"7-2":"🌹","8-2":"💍","9-2":"🍫","10-2":"🧸",
-"11-2":"🤝","12-2":"🤗","13-2":"💋","14-2":"❤️"
-};
-const emo=eMap[d]||"❤️";
+function petals(){
 setInterval(()=>{
-const e=document.createElement("div");
-e.className="emoji";
-e.innerText=emo;
-e.style.left=Math.random()*100+"vw";
-e.style.animationDuration=(3+Math.random()*3)+"s";
-document.body.appendChild(e);
-setTimeout(()=>e.remove(),6000);
-},450);
+const p=document.createElement("img");
+p.src="https://images.unsplash.com/photo-1519681393784-d120267933ba";
+p.className="petal";
+p.style.left=Math.random()*100+"vw";
+p.style.animationDuration=(6+Math.random()*4)+"s";
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),10000);
+},500);
 }
 </script>
 
