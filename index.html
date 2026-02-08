@@ -2,36 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Love Day Card</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Card</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 *{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
 body{margin:0;background:#111;color:#fff}
 
-/* -------- COMMON -------- */
-button{
-  padding:12px 20px;
-  border:none;
-  border-radius:30px;
-  background:#25d366;
-  color:#fff;
-  font-size:16px;
-  cursor:pointer;
-}
-footer{
-  text-align:center;
-  font-size:13px;
-  opacity:.7;
-  padding:10px;
-}
-
-/* -------- LANDING -------- */
+/* ---------- PAGE 1 ---------- */
 #page1{
   min-height:100vh;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
+  background:url("https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e") center/cover;
 }
 .card{
   background:#fff;
@@ -45,37 +29,55 @@ footer{
 .preview{
   height:180px;
   border-radius:15px;
-  background:#eee center/cover no-repeat;
+  background:url("https://images.unsplash.com/photo-1517841905240-472988babdf9") center/cover;
   margin-bottom:10px;
 }
 
-/* -------- SECOND PAGE -------- */
+/* ---------- PAGE 2 ---------- */
 #page2{
   display:none;
   min-height:100vh;
   background-size:cover;
   background-position:center;
-  position:relative;
 }
 .overlay{
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.6);
   min-height:100vh;
   padding:20px;
 }
 .home{
-  position:absolute;
-  top:10px;left:10px;
-  background:#fff;color:#000;
+  background:#fff;
+  color:#000;
+  padding:8px 14px;
+  border-radius:20px;
+  border:none;
 }
 .quote{
-  margin-top:80px;
-  font-size:22px;
-  font-family:'Georgia',serif;
+  margin-top:90px;
   text-align:center;
+  font-size:22px;
   line-height:1.6;
+  font-family:'Georgia',serif;
 }
 
-/* -------- ROSE PETALS -------- */
+/* ---------- BUTTON ---------- */
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:30px;
+  background:#25d366;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+
+footer{
+  font-size:13px;
+  opacity:.7;
+  margin-top:15px;
+}
+
+/* ---------- ROSE PETALS ---------- */
 .petal{
   position:fixed;
   top:-10px;
@@ -93,15 +95,14 @@ footer{
 <!-- PAGE 1 -->
 <div id="page1">
   <div class="card">
-    <div id="imgPreview" class="preview"></div>
+    <div id="preview" class="preview"></div>
 
-    <input type="file" accept="image/*" id="imgInput"><br><br>
+    <input type="file" accept="image/*" id="img"><br><br>
 
     <button onclick="createCard()">Create Card</button>
 
     <footer>
-      Developer: Chandu  
-      <br>
+      Developer: Chandu<br>
       <a href="https://wa.me/9779802985732" target="_blank">WhatsApp</a>
     </footer>
   </div>
@@ -112,10 +113,10 @@ footer{
   <div class="overlay">
     <button class="home" onclick="goHome()">Home</button>
 
-    <div class="quote" id="quoteText"></div>
+    <div id="quote" class="quote"></div>
 
     <div style="text-align:center;margin-top:30px">
-      <button onclick="shareWA()">Share on WhatsApp</button>
+      <button onclick="share()">Share on WhatsApp</button>
     </div>
 
     <footer>
@@ -125,78 +126,73 @@ footer{
 </div>
 
 <script>
-let base64Image="";
+let img64="";
 
-/* -------- IMAGE UPLOAD -------- */
-document.getElementById('imgInput').addEventListener('change',e=>{
-  const file=e.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    base64Image=reader.result;
-    document.getElementById('imgPreview').style.backgroundImage=`url(${base64Image})`;
+/* Image upload preview */
+document.getElementById("img").addEventListener("change",e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    img64=r.result;
+    document.getElementById("preview").style.backgroundImage=`url(${img64})`;
   }
-  reader.readAsDataURL(file);
+  r.readAsDataURL(f);
 });
 
-/* -------- CREATE CARD -------- */
+/* Create card */
 function createCard(){
-  if(!base64Image){alert("Upload image first");return;}
-  location.hash=encodeURIComponent(base64Image);
-  loadPage2();
+  if(!img64){alert("Please upload image");return;}
+  location.hash=encodeURIComponent(img64);
+  openPage2();
 }
 
-/* -------- LOAD PAGE 2 -------- */
-function loadPage2(){
-  document.getElementById('page1').style.display='none';
-  document.getElementById('page2').style.display='block';
-
+/* Open second page */
+function openPage2(){
+  document.getElementById("page1").style.display="none";
+  document.getElementById("page2").style.display="block";
   const img=decodeURIComponent(location.hash.substring(1));
-  document.getElementById('page2').style.backgroundImage=`url(${img})`;
-
-  document.getElementById('quoteText').innerText=getQuote();
+  document.getElementById("page2").style.backgroundImage=`url(${img})`;
+  document.getElementById("quote").innerText=getQuote();
   petals();
 }
 
-/* -------- QUOTES BY DATE -------- */
+/* Quotes by date */
 function getQuote(){
   const d=new Date().getDate();
-  const quotes={
-    7:"🌹 My love, every rose reminds me how deeply my heart beats for you.",
-    14:"💖 You are my today, my tomorrow, and every heartbeat in between.",
-    21:"✨ Loving you is the most beautiful decision of my life."
-  };
-  return quotes[d] || "💌 My love grows stronger for you with every passing day.";
+  if(d==7) return "🌹 My love, this rose carries every feeling my heart holds for you.";
+  if(d==14) return "💖 You are my forever Valentine, today and always.";
+  return "💌 Every heartbeat of mine whispers your name.";
 }
 
-/* -------- PETALS -------- */
+/* Rose petals */
 function petals(){
-  for(let i=0;i<20;i++){
+  for(let i=0;i<18;i++){
     const p=document.createElement("div");
     p.className="petal";
     p.innerText="🌹";
     p.style.left=Math.random()*100+"vw";
-    p.style.animationDuration=5+Math.random()*5+"s";
+    p.style.animationDuration=4+Math.random()*6+"s";
     document.body.appendChild(p);
-    setTimeout(()=>p.remove(),10000);
+    setTimeout(()=>p.remove(),9000);
   }
 }
 
-/* -------- WHATSAPP SHARE -------- */
-function shareWA(){
-  const text=encodeURIComponent("I made a special love card for you 💖");
-  const url=encodeURIComponent(location.href);
-  window.open(`https://wa.me/?text=${text}%0A${url}`,"_blank");
+/* WhatsApp share */
+function share(){
+  const t=encodeURIComponent("I made a special love card for you 💖");
+  const u=encodeURIComponent(location.href);
+  window.open(`https://wa.me/?text=${t}%0A${u}`);
 }
 
-/* -------- HOME -------- */
+/* Home */
 function goHome(){
   location.hash="";
   location.reload();
 }
 
-/* Auto open page2 if link has image */
-if(location.hash.length>10) loadPage2();
+/* Auto open via link */
+if(location.hash.length>10) openPage2();
 </script>
 
 </body>
